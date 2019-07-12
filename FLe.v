@@ -1,6 +1,7 @@
 Require Import Lang.
 Require Import Multiset.
 Require Import Maybe.
+Require Import Formula.
 
 Reserved Notation "G ⇒ p" (no associativity, at level 61). (* 21d2 *)
 Inductive FLe : multiset prop -> maybe_prop -> Prop :=
@@ -24,3 +25,5 @@ Inductive FLe : multiset prop -> maybe_prop -> Prop :=
             G;D;(a ⊃ b) ⇒ p
 | ImplR:  forall G (a b : prop), G;a ⇒ b -> G ⇒ (a ⊃ b)
 where "G ⇒ p" := (FLe G p).
+
+Notation "⇒ p" := (∅ ⇒ p) (no associativity, at level 62).
