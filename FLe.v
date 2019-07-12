@@ -27,3 +27,27 @@ Inductive FLe : multiset prop -> maybe_prop -> Prop :=
 where "G ⇒ p" := (FLe G p).
 
 Notation "⇒ p" := (∅ ⇒ p) (no associativity, at level 62).
+
+Definition post_interpolant_ex (p : prop) (v : set atom) :=
+  exists a,
+    (atoms a) ⊆ v /\
+    ⇒ (p ⊃ a) /\
+    forall b, (atoms p) ∩ (atoms b) ⊆ v -> ⇒ (p ⊃ b) ->
+      ⇒ (a ⊃ b).
+
+Definition post_interpolant_prop := forall (p : prop) (v : set atom),
+  v ⊆ (atoms p) -> post_interpolant_ex p v.
+
+Definition pre_interpolant_ex (p : prop) (v : set atom) :=
+  exists a,
+    (atoms a) ⊆ v /\
+    ⇒ (a ⊃ p) /\
+    forall b, (atoms p) ∩ (atoms b) ⊆ v -> ⇒ (b ⊃ p) ->
+      ⇒ (b ⊃ a).
+
+Definition pre_interpolant_prop := forall (p : prop) (v : set atom),
+  v ⊆ (atoms p) -> pre_interpolant_ex p v.
+
+Lemma l34A : forall (p : prop) (a : atom),
+  a ∈ (atoms p) -> post_interpolant_ex p ((atoms p) \ {{a}}) ->
+    post_interpolant_prop.
