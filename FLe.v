@@ -49,35 +49,21 @@ Definition pre_interpolant_ex (p : prop) (v : atom_set) :=
 Definition pre_interpolant_prop (p : prop) := forall (v : atom_set),
   v ⊆ (atoms p) -> pre_interpolant_ex p v.
 
-Require Import Nat.
-
-Definition post_interpolant_bounded (n : nat) (p : prop) :=
-  forall v : atom_set,
-  v ⊆ (atoms p) -> #((atoms p) \ v) = n -> post_interpolant_ex p v.
-
-Definition pre_interpolant_bounded (n : nat) (p : prop) :=
-  forall v : atom_set,
-  v ⊆ (atoms p) -> #((atoms p) \ v) = n -> pre_interpolant_ex p v.
-
-Lemma set_card_ind : forall (P : atom_set -> Prop),
-  P EMP ->
-  (forall (n : nat),
-    (forall (s : atom_set), #s = n -> P s) ->
-      (forall (s' : atom_set), #s' = S n -> P s')) ->
-  forall s, P s.
-Proof.
-  intros P PEMP IH. induction s as [| h t IHs'].
-    - apply PEMP.
-    - remember (length t) as n'. apply (IH n').
-
 
 Lemma l34A : forall (p : prop) (a : atom),
   a ∈ (atoms p) -> post_interpolant_ex p ((atoms p) \ {{a}}) ->
-    post_interpolant_prop p.
+    forall q, post_interpolant_prop q.
 Proof.
   unfold post_interpolant_prop. unfold post_interpolant_ex.
-  intros p a aInp loc v Sub_v.
-  apply (nat_ind
-          (pre_interpolant_ex p v) (* P *)
-
-        )
+  intros p a aInp loc q v.
+  remember (#((atoms q) \ v)) as n.
+  generalize dependent q. generalize dependent v.
+  induction n as [| n' IHn']; intros v q card vSub.
+    - symmetry in card. apply List.length_zero_iff_nil in card.
+      apply subset_diff_iff in card.
+      destruct (set_eq (atoms q) v card vSub).
+      exists q. split; try split.
+        + apply card.
+        + apply ImplR. apply A1.
+        + intros b Meet me. apply me.
+    - 
