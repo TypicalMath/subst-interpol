@@ -1,7 +1,7 @@
-Parameter atom : Set.
+Require Import Coq.Arith.Arith.
 
 Inductive prop : Type :=
-| Var : atom  -> prop
+| Var : nat  -> prop
 | Bot : prop
 | Top : prop
 | Zero : prop
@@ -25,17 +25,8 @@ Infix "⊃" := LDiv (right associativity, at level 54). (* 2283 *)
 Infix "⊂" := RDiv (right associativity, at level 55). (* 2282 *)
 Infix "⊗" := MCon (right associativity, at level 56). (* 2297 *)
 
-Axiom atomeq_dec : forall a b : atom, {a = b} + {a <> b}.
-
 Theorem propeq_dec : forall p q : prop, {p = q} + {p <> q}.
 Proof.
-  induction p; induction q;
-      try (left; reflexivity);
-      try (right; intros H; inversion H; contradiction H);
-      try (destruct (IHp1 q1); destruct (IHp2 q2); subst;
-        try (right; intros H; inversion H; contradiction n);
-        left; reflexivity).
-    destruct (atomeq_dec a a0).
-      - left. subst. reflexivity.
-      - right. intros H. inversion H. contradiction n.
+	decide equality.
+	apply eq_nat_dec.
 Qed.
