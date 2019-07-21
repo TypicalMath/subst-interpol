@@ -1,0 +1,3 @@
+[submodule "strong-induction"]
+	path = strong-induction
+	url = ../strong-induction/

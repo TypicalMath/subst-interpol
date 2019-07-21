@@ -105,6 +105,46 @@ Proof.
       apply H1 in con. apply H in con. inversion con.
 Qed.
 
+Lemma add_preserve : forall a s, a ∈ s -> s << a = s.
+Proof.
+  intros a s aIs. apply set_eq; unfold List.incl; intros a0 H.
+    - apply set_add_elim in H.
+      destruct H as [a0Ea | a0Is].
+        + rewrite a0Ea. apply aIs.
+        + apply a0Is.
+    - apply set_add_intro. right. apply H.
+Qed.
+
+Lemma add_length1 : forall a s, a ∈ s -> #(s << a) = # s.
+Proof. intros a s aIs. apply f_equal. apply add_preserve. apply aIs. Qed.
+
+Lemma add_length2 : forall a s, ~ a ∈ s -> #(s << a) = S(# s).
+Proof.
+  intros a s aIs. assert (add_adds: s << a = cons a s). { (* Totally BS *)
+    apply set_eq; unfold List.incl; intros a0 H;
+      try apply set_add_elim in H;
+      try apply set_add_intro;
+        destruct H as [H | H];
+          try (left; symmetry; apply H);
+          try (right; apply H).
+  }
+  rewrite add_adds. reflexivity.
+Qed.
+
+Theorem diff_length : forall a b, #(a \ b) <= # a.
+Proof.
+  intros a b. induction a as [| h t IHt]; simpl.
+    - apply le_n.
+    - destruct (set_memP h b) as [hIb | hNb].
+      + apply le_S. apply IHt.
+      + destruct (set_memP h t).
+        * rewrite (add_length1 h (t \ b) (set_diff_intro _ h t b H hNb)).
+          apply le_S. apply IHt.
+        * rewrite (add_length2 h (t \ b)).
+          { apply le_n_S. apply IHt. }
+          { intros con. contradiction H. apply set_diff_elim1 in con. apply con. }
+Qed.
+
 Theorem diff_inter_elim : forall a b : atom_set, a \ (b ∩ a) = a \ b.
 Proof.
   intros a b. apply set_eq.
