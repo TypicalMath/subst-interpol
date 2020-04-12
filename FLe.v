@@ -32,8 +32,30 @@ where "G ⇒ p" := (FLe G p).
 
 Notation "⇒ p" := ([] ⇒ p) (no associativity, at level 62).
 
-Lemma implR_transitive : forall p q r, ⇒ (p ⊃ q) -> ⇒ (q ⊃ r) -> ⇒ (p ⊃ r).
+Lemma cut : forall G S X (a p : prop), G ⇒ a -> S++a::X ⇒ p -> S++G++X ⇒ p.
 Proof. Admitted.
+
+Lemma mp : forall p q : prop, (p ⊃ q)::p ⇒ q.
+Proof.
+  intros p q. rewrite (app_nil_end p).
+  apply (ImplL p [] p q q); apply A1.
+Qed.
+
+Lemma deduction : forall p q : prop, p ⇒ q <-> ⇒ p ⊃ q.
+Proof.
+  intros; split; intros H.
+    - apply ImplR. apply H.
+    - apply (cut [] [] [p] (p ⊃ q) q H (mp p q)).
+Qed.
+
+Lemma implR_transitive : forall p q r, ⇒ (p ⊃ q) -> ⇒ (q ⊃ r) -> ⇒ (p ⊃ r).
+Proof.
+  intros p q r pAq qAr.
+  apply ImplR.
+  apply (cut [p] [] [] q r); simpl; apply deduction.
+    - apply pAq.
+    - apply qAr.
+Qed.
 
 Definition post_interpolant_ex (p : prop) (v : finset) :=
   exists a : prop,
